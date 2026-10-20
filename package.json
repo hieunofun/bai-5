@@ -1,9 +1,11 @@
 {
-  "name": "bai-2",
+  "name": "course-manager",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "dependencies": {
     "@expo/ui": "~57.0.20",
+    "@expo/vector-icons": "^15.0.2",
+    "@react-native-async-storage/async-storage": "2.2.0",
     "expo": "~57.0.25",
     "expo-constants": "~57.0.19",
     "expo-device": "~57.0.2",
@@ -16,6 +18,7 @@
     "expo-status-bar": "~57.0.1",
     "expo-symbols": "~57.0.3",
     "expo-system-ui": "~57.0.4",
+    "expo-video": "~57.0.5",
     "expo-web-browser": "~57.0.3",
     "react": "19.2.3",
     "react-dom": "19.2.3",
@@ -39,7 +42,10 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "typecheck": "tsc --noEmit",
+    "seed": "node scripts/seed-mockapi.mjs",
+    "test": "node scripts/test-domain.mjs"
   },
   "private": true
 }

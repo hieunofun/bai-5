@@ -1,0 +1,106 @@
+{
+  "categories": [
+    {
+      "key": "mobile",
+      "name": "Lập trình Mobile",
+      "description": "Android, Flutter và React Native"
+    },
+    {
+      "key": "web",
+      "name": "Lập trình Web",
+      "description": "Frontend, Backend và xây dựng REST API"
+    },
+    {
+      "key": "ai",
+      "name": "Trí tuệ nhân tạo",
+      "description": "Python, Machine Learning và Deep Learning"
+    }
+  ],
+  "courses": [
+    {
+      "categoryKey": "mobile",
+      "title": "Lập trình Android cơ bản",
+      "description": "Làm quen Kotlin, xây dựng giao diện và kết nối REST API trong ứng dụng Android.",
+      "instructor": "Nguyễn Văn An",
+      "price": 500000,
+      "duration": 30
+    },
+    {
+      "categoryKey": "mobile",
+      "title": "React Native từ cơ bản đến thực hành",
+      "description": "Xây dựng ứng dụng đa nền tảng với Expo, Expo Router và TypeScript. Thực hành quản lý dữ liệu qua API.",
+      "instructor": "Trần Minh Anh",
+      "price": 650000,
+      "duration": 36
+    },
+    {
+      "categoryKey": "mobile",
+      "title": "Flutter và Dart cho người mới",
+      "description": "Tìm hiểu widget, quản lý trạng thái và gọi API để tạo ứng dụng di động bằng Flutter.",
+      "instructor": "Lê Hoàng Nam",
+      "price": 550000,
+      "duration": 32
+    },
+    {
+      "categoryKey": "mobile",
+      "title": "Thiết kế giao diện ứng dụng di động",
+      "description": "Thực hành bố cục, form, điều hướng và trạng thái loading, rỗng, lỗi trên thiết bị di động.",
+      "instructor": "Phạm Thu Hà",
+      "price": 0,
+      "duration": 12
+    },
+    {
+      "categoryKey": "web",
+      "title": "HTML và CSS nền tảng",
+      "description": "Xây dựng website đầu tiên với HTML ngữ nghĩa, CSS Flexbox, Grid và giao diện responsive.",
+      "instructor": "Võ Thanh Bình",
+      "price": 250000,
+      "duration": 20
+    },
+    {
+      "categoryKey": "web",
+      "title": "JavaScript hiện đại",
+      "description": "Nắm vững biến, hàm, mảng, promise, async/await và cách giao tiếp với REST API.",
+      "instructor": "Đặng Quốc Huy",
+      "price": 400000,
+      "duration": 28
+    },
+    {
+      "categoryKey": "web",
+      "title": "Xây dựng ứng dụng Web với React",
+      "description": "Sử dụng component, hooks và TypeScript để tạo ứng dụng React có chức năng CRUD hoàn chỉnh.",
+      "instructor": "Nguyễn Thảo Vy",
+      "price": 700000,
+      "duration": 40
+    },
+    {
+      "categoryKey": "web",
+      "title": "Node.js và REST API",
+      "description": "Thiết kế endpoint, xử lý request, kiểm tra dữ liệu đầu vào và quản lý lỗi API bằng Node.js.",
+      "instructor": "Bùi Đức Long",
+      "price": 600000,
+      "duration": 35
+    },
+    {
+      "categoryKey": "ai",
+      "title": "Python cho phân tích dữ liệu",
+      "description": "Thực hành Python, NumPy và Pandas để làm sạch, phân tích và trực quan hóa dữ liệu.",
+      "instructor": "Đỗ Mai Linh",
+      "price": 450000,
+      "duration": 26
+    },
+    {
+      "categoryKey": "ai",
+      "title": "Machine Learning nhập môn: từ dữ liệu đến mô hình dự đoán",
+      "description": "Làm quen hồi quy, phân loại, chia tập dữ liệu và đánh giá mô hình Machine Learning qua bài tập thực tế.",
+      "instructor": "Hoàng Gia Bảo",
+      "price": 850000,
+      "duration": 45
+    }
+  ],
+  "thumbnails": [
+    "https://images.unsplash.com/photo-1555066931-bf19f8fd1085?w=800&q=80&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1641736494173-e7d5775121b2?w=800&q=80&auto=format&fit=crop"
+  ],
+  "trailerUrl": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+}

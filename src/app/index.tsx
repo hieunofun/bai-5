@@ -1,118 +1,282 @@
-import { ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
+import { useMemo, useState } from 'react';
+import {
+  FlatList,
+  Pressable,
+  RefreshControl,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from 'react-native';
+import { CourseCover } from '@/components/course-cover';
+import {
+  AppText,
+  Banner,
+  Button,
+  ConnectionRequired,
+  EmptyState,
+  Field,
+  Icon,
+  IconButton,
+  LoadingState,
+  Screen,
+  SelectField,
+  uiStyles,
+} from '@/components/course-ui';
+import { palette } from '@/constants/course-theme';
+import { useCourses } from '@/providers/course-provider';
+import { formatPrice, searchCourses } from '@/utils/courses';
 
-const COLORS = {
-  blue: '#2D7BEA',
-  red: '#FA3D3F',
-  yellow: '#FFDA20',
-  green: '#2BAE6C',
-  purple: '#7D3BDD',
-  orange: '#FF7914',
-};
-
-export default function HomeScreen() {
+export default function CoursesScreen() {
+  const {
+    baseUrl,
+    ready,
+    loading,
+    refreshing,
+    error,
+    categories,
+    courses,
+    refresh,
+  } = useCourses();
+  const [query, setQuery] = useState('');
+  const [categoryId, setCategoryId] = useState('');
   const { width } = useWindowDimensions();
-  const fontSize = width > 0 ? Math.max(28, Math.min(48, (width * 48) / 600)) : 48;
-
+  const columns = width >= 680 ? 2 : 1;
+  const filtered = useMemo(
+    () => searchCourses(courses, query, categoryId),
+    [courses, query, categoryId],
+  );
+  const categoryNames = useMemo(
+    () => new Map(categories.map((category) => [category.id, category.name])),
+    [categories],
+  );
+  const hasFilters = Boolean(query.trim() || categoryId);
   return (
-    <SafeAreaView style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.board}>
-          <View
-            accessible
-            accessibilityLabel="Ô số 1, màu xanh dương"
-            style={[styles.block, styles.bar, { backgroundColor: COLORS.blue }]}
-          >
-            <Text style={[styles.number, { fontSize }]}>1</Text>
-          </View>
-
-          <View
-            accessible
-            accessibilityLabel="Ô số 2, màu đỏ"
-            style={[styles.block, styles.bar, { backgroundColor: COLORS.red }]}
-          >
-            <Text style={[styles.number, { fontSize }]}>2</Text>
-          </View>
-
-          <View style={styles.middleRow}>
-            <View
-              accessible
-              accessibilityLabel="Ô số 3, màu vàng"
-              style={[styles.block, styles.middleBlock, { backgroundColor: COLORS.yellow }]}
-            >
-              <Text style={[styles.number, styles.blackNumber, { fontSize }]}>3</Text>
+    <Screen
+      title="Khóa học"
+      subtitle="Quản lý nội dung học tập"
+      tab="/"
+      action={
+        baseUrl ? (
+          <IconButton
+            icon="plus"
+            label="Thêm khóa học"
+            onPress={() => router.push('/courses/form')}
+          />
+        ) : undefined
+      }
+    >
+      {!ready ? (
+        <LoadingState />
+      ) : !baseUrl ? (
+        <ConnectionRequired />
+      ) : (
+        <FlatList
+          key={columns}
+          data={loading ? [] : filtered}
+          numColumns={columns}
+          keyExtractor={(course) => course.id}
+          contentContainerStyle={uiStyles.content}
+          columnWrapperStyle={columns > 1 ? { gap: 12 } : undefined}
+          ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          initialNumToRender={6}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing && !loading}
+              onRefresh={() => void refresh()}
+              tintColor={palette.primary}
+            />
+          }
+          ListHeaderComponent={
+            <View style={styles.filters}>
+              {error ? (
+                <>
+                  <Banner message={error} />
+                  <Button
+                    title="Thử tải lại"
+                    icon="refresh-cw"
+                    onPress={() => void refresh()}
+                    loading={refreshing}
+                  />
+                </>
+              ) : null}
+              <View style={uiStyles.card}>
+                <Field
+                  label="Tìm khóa học"
+                  value={query}
+                  onChangeText={setQuery}
+                  placeholder="Nhập tên khóa học…"
+                  autoCorrect={false}
+                  returnKeyType="search"
+                />
+                <SelectField
+                  label="Danh mục"
+                  value={categoryId}
+                  options={[
+                    { label: 'Tất cả danh mục', value: '' },
+                    ...categories.map((category) => ({
+                      value: category.id,
+                      label: category.name,
+                    })),
+                  ]}
+                  onChange={setCategoryId}
+                />
+              </View>
+              <View style={styles.resultHeader}>
+                <AppText weight="semibold" style={uiStyles.sectionTitle}>
+                  {loading
+                    ? 'Thư viện khóa học'
+                    : `${filtered.length} khóa học`}
+                </AppText>
+                {hasFilters ? (
+                  <Button
+                    title="Xóa lọc"
+                    variant="ghost"
+                    onPress={() => {
+                      setQuery('');
+                      setCategoryId('');
+                    }}
+                  />
+                ) : (
+                  <Button
+                    title="Làm mới"
+                    icon="refresh-cw"
+                    variant="ghost"
+                    onPress={() => void refresh()}
+                    loading={refreshing}
+                  />
+                )}
+              </View>
             </View>
-            <View
-              accessible
-              accessibilityLabel="Ô số 4, màu xanh lá"
-              style={[styles.block, styles.middleBlock, { backgroundColor: COLORS.green }]}
+          }
+          ListEmptyComponent={
+            loading ? (
+              <LoadingState />
+            ) : error ? (
+              <EmptyState
+                icon="wifi-off"
+                title="Chưa tải được dữ liệu"
+                description="Thử lại khi kết nối mạng ổn định hoặc kiểm tra địa chỉ API trong tab Kết nối."
+              />
+            ) : (
+              <EmptyState
+                title={
+                  hasFilters ? 'Không tìm thấy khóa học' : 'Chưa có khóa học'
+                }
+                description={
+                  hasFilters
+                    ? 'Thử tên khác hoặc chọn tất cả danh mục.'
+                    : 'Thêm khóa học đầu tiên để bắt đầu xây dựng thư viện.'
+                }
+                action={
+                  hasFilters ? (
+                    <Button
+                      title="Xóa bộ lọc"
+                      onPress={() => {
+                        setQuery('');
+                        setCategoryId('');
+                      }}
+                    />
+                  ) : (
+                    <Button
+                      title="Thêm khóa học"
+                      variant="primary"
+                      icon="plus"
+                      onPress={() => router.push('/courses/form')}
+                    />
+                  )
+                }
+              />
+            )
+          }
+          renderItem={({ item: course }) => (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`Xem khóa học ${course.title}`}
+              onPress={() =>
+                router.push({
+                  pathname: '/courses/[id]',
+                  params: { id: course.id },
+                })
+              }
+              style={({ pressed }) => [
+                styles.courseCard,
+                { flex: 1, maxWidth: columns > 1 ? '50%' : '100%' },
+                pressed && { opacity: 0.8 },
+              ]}
             >
-              <Text style={[styles.number, { fontSize }]}>4</Text>
-            </View>
-            <View
-              accessible
-              accessibilityLabel="Ô số 5, màu tím"
-              style={[styles.block, styles.middleBlock, { backgroundColor: COLORS.purple }]}
-            >
-              <Text style={[styles.number, { fontSize }]}>5</Text>
-            </View>
-          </View>
-
-          <View
-            accessible
-            accessibilityLabel="Ô số 6, màu cam"
-            style={[styles.block, styles.bottom, { backgroundColor: COLORS.orange }]}
-          >
-            <Text style={[styles.number, { fontSize }]}>6</Text>
-          </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+              <CourseCover uri={course.thumbnail} title={course.title} />
+              <View style={styles.courseContent}>
+                <AppText style={styles.category}>
+                  {categoryNames.get(course.categoryId) ??
+                    'Danh mục không còn tồn tại'}
+                </AppText>
+                <AppText
+                  weight="semibold"
+                  style={styles.courseTitle}
+                  numberOfLines={2}
+                >
+                  {course.title}
+                </AppText>
+                <View style={uiStyles.row}>
+                  <Icon name="user" size={15} />
+                  <AppText style={styles.instructor}>
+                    {course.instructor}
+                  </AppText>
+                </View>
+                <View style={styles.courseFooter}>
+                  <AppText weight="semibold" style={styles.price}>
+                    {formatPrice(course.price)}
+                  </AppText>
+                  <View style={styles.duration}>
+                    <Icon name="clock" size={15} />
+                    <AppText style={styles.instructor}>
+                      {course.duration} giờ
+                    </AppText>
+                  </View>
+                </View>
+              </View>
+            </Pressable>
+          )}
+        />
+      )}
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 16,
-  },
-  scrollContent: {
-    alignItems: 'center',
-    paddingTop: 16,
-    paddingBottom: 24,
-  },
-  board: {
-    width: '100%',
-    maxWidth: 600,
-    gap: 10,
-  },
-  bar: {
-    aspectRatio: 600 / 116,
-  },
-  middleRow: {
+  filters: { gap: 16, paddingBottom: 12 },
+  resultHeader: {
     flexDirection: 'row',
-    aspectRatio: 600 / 240,
-    gap: 10,
-  },
-  middleBlock: {
-    width: '24.1667%',
-    height: '100%',
-  },
-  bottom: {
-    aspectRatio: 3,
-  },
-  block: {
+    justifyContent: 'space-between',
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: 12,
   },
-  number: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-    includeFontPadding: false,
-    textAlign: 'center',
+  courseCard: {
+    backgroundColor: palette.surface,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: palette.border,
+    padding: 12,
+    gap: 12,
   },
-  blackNumber: {
-    color: '#000000',
+  courseContent: { gap: 8, paddingHorizontal: 4, paddingBottom: 4 },
+  category: { fontSize: 12, lineHeight: 19, color: palette.muted },
+  courseTitle: { fontSize: 17, lineHeight: 25 },
+  instructor: { fontSize: 13, lineHeight: 20, color: palette.muted },
+  courseFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: palette.borderStrong,
+    marginTop: 4,
+    flexWrap: 'wrap',
   },
+  price: { fontSize: 17, lineHeight: 25 },
+  duration: { flexDirection: 'row', alignItems: 'center', gap: 6 },
 });
